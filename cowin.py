@@ -3,12 +3,13 @@ import json
 from json import JSONDecodeError
 import os
 import time
-import datetime
+from datetime import datetime
+
 district_id = '294'
-date= datetime.datetime.today().strftime('%d-%m-%Y')
+date= datetime.today().strftime('%d-%m-%Y')
+
 url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id="+district_id+"&date="+date
 
-payload={}
 headers = {
   'authority': 'cdn-api.co-vin.in',
   'pragma': 'no-cache',
@@ -28,17 +29,15 @@ headers = {
 
 print(date)
 while 1:
+    time.sleep(10)
     try:
-        time.sleep(10)
-        response = requests.request("GET", url, headers=headers, data=payload)
+        response = requests.request("GET", url, headers=headers, data={})
         available_centers = json.loads(response.text)
-        
         for c in available_centers['centers']:
                 for session in c['sessions']:
-                    if(session['min_age_limit']==18  and session['available_capacity']>0):
-                        os.system('say "appointment found please check"')
-                        # send_otp_req()
-                        print(c['name']+':  '+str(c['pincode']))
-                        print(session) 
+                    if(session['min_age_limit']==18  and session['available_capacity']>0):  # and session['vaccine'] == 'COVAXIN'
+                        print(datetime.today().strftime('%H:%M:%S') + '\t\t' + c['name']+':  '+ str(c['pincode']))
+                        print(session)
+                        print()
     except JSONDecodeError:
-        print(response.text)
+        print(datetime.today().strftime('%H:%M:%S') + '\t\t' + response.text + '\n')
